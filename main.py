@@ -13,7 +13,7 @@ app = FastAPI()
 
 
 
-@app.post("/process-document/")
+@app.post("/")
 async def process_document(file: UploadFile = File(...)):
     try:
         # Read the uploaded file
@@ -35,12 +35,18 @@ async def process_document(file: UploadFile = File(...)):
         
         # Extract text using OCR
         text = pytesseract.image_to_string(processed)
-        print("extracted text")
+        print(f"extracted text")
 
         # Extract structured data
         extracted_data = extract_data_from_text(text)
         # print(extracted_data)
-        response = json.loads(extracted_data)
+        if len(extracted_data) > 0:
+            response = json.loads(extracted_data)
+        else:
+            print("retrying.....")
+            extracted_data = extract_data_from_text(text)
+            response = json.loads(extracted_data)
+
         # Save to database
         # doc_dict = document.model_dump()
         # doc_id = await db.insert_document(doc_dict)

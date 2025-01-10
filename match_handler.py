@@ -49,8 +49,8 @@ def extract_data_from_text(text):
 
   **Text:** 
   Invoice No: INV-2023-001
-  Date: 2023-11-15
-  Due Date: 2023-11-30
+  Date: 15/11/2023
+  Due Date: 30/11/2023
   Supplier: Acme Corp
   Supplier Address: 123 Main St, Anytown
   Customer: XYZ Inc
@@ -61,8 +61,8 @@ def extract_data_from_text(text):
   {{
       "doc_type": "Invoice",
       "doc_number": "INV-2023-001",
-      "issue_date": "2023-11-15",
-      "due_date": "2023-11-30",
+      "issue_date": "15/11/2023",
+      "due_date": "30/11/2023",
       "supplier_name": "Acme Corp", 
       "supplier_address": "123 Main St, Anytown",
       "customer_name": "XYZ Inc",
