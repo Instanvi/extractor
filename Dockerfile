@@ -1,9 +1,9 @@
 # Use the official Python 3.11.7 slim image as the base
 FROM python:3.11-slim
 
-# Install Tesseract OCR and other necessary system dependencies
+# Install system dependencies, including Tesseract and libGL
 RUN apt-get update && \
-    apt-get install -y tesseract-ocr libtesseract-dev && \
+    apt-get install -y tesseract-ocr libtesseract-dev libgl1 && \
     rm -rf /var/lib/apt/lists/*
 
 # Set the working directory inside the container
