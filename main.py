@@ -30,7 +30,7 @@ async def process_document(file: UploadFile = File(...)):
             
             # Extract text using OCR
             text = pytesseract.image_to_string(processed)
-        print(f"extracted text")
+        print(f"extracted text\n")
 
         # Extract structured data
         extracted_data = extract_data_from_text(text)

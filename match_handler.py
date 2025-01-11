@@ -1,4 +1,5 @@
 import openai
+import json
 import os
 from dotenv import load_dotenv
 
@@ -9,6 +10,45 @@ load_dotenv()
 
 # Set your OpenAI API key
 openai.api_key = os.getenv("OPENAI_API_KEY")
+
+def check_output(extracted_data):
+   sample_output = {
+        "doc_type": "Invoice",
+        "doc_number": "INV-2023-001",
+        "issue_date": "15/11/2023",
+        "due_date": "30/11/2023",
+        "supplier_name": "Acme Corp",
+        "supplier_address": "123 Main St, Anytown",
+        "customer_name": "XYZ Inc",
+        "customer_address": "456 Elm St, Othertown",
+        "total_amount": "1000.00",
+        "tax_amount": "100.00",
+        "currency": "$",
+        "line_items": [
+            {
+                "item_name": "Product A",
+                "quantity": 2,
+                "unit_price": "50.00",
+                "amount": "100.00",
+                "currency": "$"
+            },
+            {
+                "item_name": "Product B",
+                "quantity": 1,
+                "unit_price": "50.00",
+                "amount": "50.00",
+                "currency": "$"
+            }
+        ]
+    }
+   try:
+        json_data = json.loads(extracted_data)
+        sample_json = json.loads(sample_output)
+        
+        return sorted(json_data.items()) == sorted(sample_json.items())
+   except Exception as e:
+      print(f"Exception: {e}")
+      return True
 
 def extract_data_from_text(text):
   """
@@ -42,9 +82,6 @@ def extract_data_from_text(text):
       - amount
       - currency)
 
-  **Important:**
-  - If none of the requested data is found in the text, return an empty string (`""`).
-  - Do not generate or assume any data that is not explicitly present in the text.
 
   **Text:**
   {text}
@@ -63,7 +100,7 @@ def extract_data_from_text(text):
 
   **Example Output:**
 
-  1. If relevant data is present:
+  If relevant data is present:
   {{
     "doc_type": "Invoice",
     "doc_number": "INV-2023-001",
@@ -81,11 +118,30 @@ def extract_data_from_text(text):
         {{"item_name": "Product B", "quantity": 1, "unit_price": "50.00", "amount": "50.00", "currency":"$"}}
     ]
   }}
-
-  2. If no relevant data is found:
-  ""
-  
+    """
   """
+    **Sample Output:**
+    {
+        "doc_type": "",
+        "doc_number": "",
+        "issue_date": "",
+        "due_date": "",
+        "supplier_name": "", 
+        "supplier_address": "",
+        "customer_name": "",
+        "customer_address": "",
+        "total_amount": "", 
+        "tax_amount": "",
+        "currency": "",
+        "line_items": [
+            {{"item_name": "", "quantity": 2, "unit_price": "", "amount": "", "currency":""}},
+            {{"item_name": "", "quantity": 1, "unit_price": "", "amount": "", "currency":""}}
+        ]
+    }
+ """
+
+
+
 
   response = openai.completions.create(
       model="gpt-3.5-turbo-instruct",  # Choose an appropriate model
@@ -97,8 +153,13 @@ def extract_data_from_text(text):
   )
 
   try:
-      extracted_data = response.choices[0].text.strip()  # Get the text directly
-      return extracted_data
+    extracted_data = response.choices[0].text.strip()  # Get the text directly
+    is_dummy = check_output(extracted_data)
+    if is_dummy:
+        print("is same")
+        return ""
+    return extracted_data
   except (SyntaxError, NameError):
       print("Error parsing the output from the language model.")
       return None
+  
