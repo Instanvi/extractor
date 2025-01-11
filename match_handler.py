@@ -12,7 +12,7 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def check_output(extracted_data):
-   sample_output = {
+   sample_output = """{
         "doc_type": "Invoice",
         "doc_number": "INV-2023-001",
         "issue_date": "15/11/2023",
@@ -40,7 +40,7 @@ def check_output(extracted_data):
                 "currency": "$"
             }
         ]
-    }
+    }"""
    try:
         json_data = json.loads(extracted_data)
         sample_json = json.loads(sample_output)
