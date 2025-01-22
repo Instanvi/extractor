@@ -2,13 +2,47 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 from pdf2image import convert_from_bytes
 import pytesseract
+from pymongo import MongoClient
 import cv2
 import numpy as np
 from match_handler import extract_data_from_text
 from data_extractor import extract_text_from_pdf
+from database import DataHandler
 import json
+import os
+import logging
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 app = FastAPI()
+
+
+@app.on_event("startup")
+async def startup_db_client():
+    global client
+    global doc_inserter
+    client = MongoClient(os.environ["MONGO_URI"])
+    
+    doc_inserter = DataHandler(
+        client= client,
+        database_name= os.environ["DB_NAME"],
+        collection_name= os.environ["EXT_COLLECTION"]
+    )
+
+    # print("MongoDB client initialized")
+    logger.info(f"MongoDB client initialized")
+
+# Shutdown event: Close MongoDB connection
+@app.on_event("shutdown")
+async def shutdown_db_client():
+    global client
+    if client:
+        client.close()
+        logger.info(f"MongoDB client closed")
+
+
 
 @app.post("/")
 async def process_document(file: UploadFile = File(...)):
@@ -38,6 +72,12 @@ async def process_document(file: UploadFile = File(...)):
         print(len(extracted_data))
         if len(extracted_data) > 0:
             response = json.loads(extracted_data)
+            document = {
+                "text": text,
+                "label": response
+            }
+            doc_id = doc_inserter.insert_document(document)
+
         else:
             print("retrying.....")
             extracted_data = extract_data_from_text(text)
@@ -58,6 +98,7 @@ async def process_document(file: UploadFile = File(...)):
         # Save to database
         # doc_dict = document.model_dump()
         # doc_id = await db.insert_document(doc_dict)
+        
         
         return response
     except ValueError as ve:

@@ -3,8 +3,6 @@ import json
 import os
 from dotenv import load_dotenv
 
-# Ensure you have installed the latest OpenAI library
-# pip install openai --upgrade
 
 load_dotenv()
 
@@ -144,12 +142,12 @@ def extract_data_from_text(text):
 
 
   response = openai.completions.create(
-      model="gpt-3.5-turbo-instruct",  # Choose an appropriate model
+      model="gpt-3.5-turbo-instruct",
       prompt=prompt,
       max_tokens=1024,
       n=1,
       stop=None,
-      temperature=0.5,  # Adjust temperature for creativity
+      temperature=0.5, 
   )
 
   try:
