@@ -44,7 +44,7 @@ async def shutdown_db_client():
 
 
 
-@app.post("/")
+@app.post("/supplier")
 async def process_document(file: UploadFile = File(...)):
     try:
         # Read the uploaded file
