@@ -24,10 +24,11 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allow all origins (for development only)
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_methods=["GET", "POST", "PUT", "DELETE"],  # Allow all methods (GET, POST, etc.)
     allow_headers=["*"],  # Allow all headers
 )
 
+logger = logging.getLogger(__name__)
 
 @app.on_event("startup")
 async def startup_db_client():
