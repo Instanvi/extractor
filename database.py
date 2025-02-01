@@ -25,6 +25,7 @@ class DataHandler:
 
 
         self.client = client
+        self.collection_name = collection_name
         self.db = self.client[database_name]
 
         # Ensure collection exists
