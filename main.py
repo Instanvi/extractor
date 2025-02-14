@@ -137,7 +137,8 @@ async def process_potta(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="File is not an image (invalid content)")
         
         extracted_data = equalizer(contents)
-        response = json.loads(extracted_data)
+        # response = json.loads(extracted_data)
+        response = extracted_data
         return response
     
     except Exception as e:
