@@ -9,14 +9,14 @@ import numpy as np
 from match_handler import extract_data_from_text
 from data_extractor import extract_text_from_pdf
 from database import DataHandler
+from potta_handler import equalizer
 import json
 import os
 import logging
+import imghdr
 from dotenv import load_dotenv
 
-
 load_dotenv()
-
 app = FastAPI()
 
 # Configure CORS
@@ -29,6 +29,7 @@ app.add_middleware(
 )
 
 logger = logging.getLogger(__name__)
+
 
 @app.on_event("startup")
 async def startup_db_client():
@@ -114,5 +115,30 @@ async def process_document(file: UploadFile = File(...)):
         return response
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+@app.post("/supplier/potta")
+async def process_potta(file: UploadFile = File(...)):
+    try:
+        ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/jpg"}
+        if file.content_type not in ALLOWED_IMAGE_TYPES:
+            raise HTTPException(status_code=400, detail="File is not an acceptable image (invalid MIME type)")
+
+        # Optional: Check file extension
+        if not file.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
+            raise HTTPException(status_code=400, detail="File is not an image (invalid file extension)")
+        
+        contents = await file.read()
+        image_type = imghdr.what(None, contents)
+        if not image_type:
+            raise HTTPException(status_code=400, detail="File is not an image (invalid content)")
+        
+        extracted_data = equalizer(contents)
+        response = json.loads(extracted_data)
+        return response
+    
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
