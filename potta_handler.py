@@ -102,6 +102,8 @@ def organise_data_main(result_content, cells, extraction_result, page):
             all_metadata_rows.pop(idx)
 
     if "account receivables" in result_content or "account payables" in result_content:
+        # doc_type, doc_id, month, year = None, None, None, None
+        month, year = None, None
         if len(all_metadata_rows) == 3:
             split_date = str(all_metadata_rows[2]).split()
             month = split_date[-2]
@@ -116,12 +118,13 @@ def organise_data_main(result_content, cells, extraction_result, page):
             year = str(all_metadata_rows[4]).replace("/", "")
 
         extraction_result[page]["metadata"] = {
-            "doc_type": all_metadata_rows[0],
-            "doc_id": all_metadata_rows[1],
-            "month": month,
-            "year": year
+            "doc_type": all_metadata_rows[0] if all_metadata_rows[0] else "",
+            "doc_id": all_metadata_rows[1] if all_metadata_rows[1] else "",
+            "month": month if month else "",
+            "year": year if year else "",
         }
     elif "expense sheet" in result_content:
+        doc_type, doc_id, month, year = None, None, None, None
         if str(all_metadata_rows[0]).lower().endswith("sheet"):
             doc_type = all_metadata_rows[0]
             doc_id = all_metadata_rows[1]
@@ -165,14 +168,14 @@ def organise_data_main(result_content, cells, extraction_result, page):
                     year = date[3].replace("/", "")
         
         extraction_result[page]["metadata"] = {
-            "doc_type": doc_type,
-            "doc_id": doc_id,
-            "month": month,
-            "year": year
+            "doc_type": doc_type if doc_type else "",
+            "doc_id": doc_id if doc_id else "",
+            "month": month if month else "",
+            "year": year if year else "",
         }
 
     elif "inventory" in result_content:
-        
+        doc_type, doc_id, month, year = None, None, None, None
         if "inventory" not in str(all_metadata_rows[0]).lower():
             print(all_metadata_rows)
             metadata_list = str(result_content).splitlines()
@@ -212,13 +215,14 @@ def organise_data_main(result_content, cells, extraction_result, page):
                     year = date[3].replace("/", "")
 
         extraction_result[page]["metadata"] = {
-            "doc_type": doc_type,
-            "doc_id": doc_id,
-            "month": month,
-            "year": year
+            "doc_type":  doc_type if doc_type else "",
+            "doc_id":  doc_id if doc_id else "",
+            "month": month if month else "",
+            "year": year if year else "",
         }
 
     elif "sales sheet" in result_content:
+        doc_type, doc_id, month, year = None, None, None, None
         if "sales sheet" not in str(all_metadata_rows[0]).lower():
             print(all_metadata_rows)
             metadata_list = str(result_content).splitlines()
@@ -293,10 +297,10 @@ def organise_data_main(result_content, cells, extraction_result, page):
                         year = date[3].replace("/", "")
 
         extraction_result[page]["metadata"] = {
-            "doc_type": doc_type,
-            "doc_id": doc_id,
-            "month": month,
-            "year": year
+            "doc_type": doc_type if doc_type else "",
+            "doc_id": doc_id if doc_id else "",
+            "month": month if month else "",
+            "year": year if year else "",
         }
 
     #Get all headers
